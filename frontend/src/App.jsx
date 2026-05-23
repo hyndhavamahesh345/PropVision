@@ -260,9 +260,11 @@ export default function App() {
   }
 
   const pollStatus = async (jobId) => {
+    let retryCount = 0
     const interval = setInterval(async () => {
       try {
         const res = await axios.get(`${API}/api/status/${jobId}`)
+        retryCount = 0  // reset on success
         const d = res.data
 
         if (d.status === 'completed') {
@@ -310,9 +312,15 @@ export default function App() {
         }
 
       } catch {
-        clearInterval(interval)
-        setError('Connection to scanner backend lost.')
-        setIsProcessing(false)
+        // Don't kill the poll on first failure — Render free tier can take 30s to wake
+        retryCount++
+        if (retryCount >= 5) {
+          clearInterval(interval)
+          setError('Backend is unreachable. If using Render free tier, open https://visionvault-xwdd.onrender.com/api/health in a new tab to wake it up, then try again.')
+          setIsProcessing(false)
+        } else {
+          setStatusMsg(`Waking up backend... (${retryCount}/5)`)
+        }
       }
     }, 1500)
   }
