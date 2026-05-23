@@ -19,7 +19,7 @@ load_dotenv()
 app = FastAPI(title="VisionVault API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],          # tighten to your Vercel URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
