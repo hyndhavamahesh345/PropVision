@@ -54,23 +54,15 @@ def compute_iou(box1, box2):
 
     return interArea / float(box1Area + box2Area - interArea)
 
-def run_nms(detections: List[Dict[str, Any]], iou_thresh: float = 0.30) -> List[Dict[str, Any]]:
-    sorted_dets = sorted(detections, key=lambda x: x.get("confidence", 0), reverse=True)
-    kept = []
-    for det in sorted_dets:
-        overlap = False
-        for k_det in kept:
-            if compute_iou(det.get("bbox", [0,0,0,0]), k_det.get("bbox", [0,0,0,0])) > iou_thresh:
-                overlap = True
-                break
-        if not overlap:
-            kept.append(det)
-    return kept
-
 def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Aggregates detections using Scene-Max + Temporal Confirmation.
+    Aggregates detections using both Scene-Max and Tracking, maintaining dual-validation logic.
     """
+    from config import USE_OBJECT_TRACKING, USE_SCENE_MAX_FALLBACK, NMS_THRESHOLD, logger
+    import supervision as sv
+    import numpy as np
+    from services.inventory.builder import UNIQUE_HOUSEHOLD_OBJECTS
+
     frame_groups: Dict[int, List[Dict[str, Any]]] = {}
     tier_counts = {"tier1": 0, "tier2": 0, "tier3": 0}
     
@@ -85,16 +77,26 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
 
     total_frames_analyzed = len(frame_groups)
     
+    # Scene-Max Storage
     class_frame_counts: Dict[str, set] = {} 
     max_counts_per_class: Dict[str, int] = {}
     uncertain_candidates: set = set()
     
-    for f_idx, raw_detections in frame_groups.items():
-        # Apply NMS to remove duplicates across models within the same frame
-        detections = run_nms(raw_detections, iou_thresh=0.45)
+    # ByteTrack Storage
+    tracker = sv.ByteTrack() if USE_OBJECT_TRACKING else None
+    tracked_unique_objects: Dict[str, set] = {}
+    
+    sorted_frame_indices = sorted(frame_groups.keys())
+    
+    for f_idx in sorted_frame_indices:
+        raw_detections = frame_groups[f_idx]
         
-        frame_counts: Dict[str, int] = {}
-        for det in detections:
+        # 1. Filter raw detections and prepare for supervision
+        boxes = []
+        confidences = []
+        class_ids = []
+        
+        for det in raw_detections:
             raw_label = det.get("label")
             conf = det.get("confidence", 0)
             bbox = det.get("bbox", [0,0,0,0])
@@ -113,39 +115,118 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
                 if area < 400:
                     continue
                 
-                if conf >= target_thresh:
-                    frame_counts[canonical] = frame_counts.get(canonical, 0) + 1
-                elif conf >= UNCERTAIN_THRESH:
-                    uncertain_candidates.add(canonical)
-                    
-        for label, count in frame_counts.items():
-            max_counts_per_class[label] = max(max_counts_per_class.get(label, 0), count)
-            if label not in class_frame_counts:
-                class_frame_counts[label] = set()
-            class_frame_counts[label].add(f_idx)
+                if conf >= target_thresh or conf >= UNCERTAIN_THRESH:
+                    boxes.append(bbox)
+                    confidences.append(conf)
+                    try:
+                        c_id = UNIQUE_HOUSEHOLD_OBJECTS.index(canonical)
+                    except ValueError:
+                        c_id = -1
+                    class_ids.append(c_id)
+        
+        # 2. Run NMS with supervision
+        if boxes:
+            detections = sv.Detections(
+                xyxy=np.array(boxes),
+                confidence=np.array(confidences),
+                class_id=np.array(class_ids)
+            )
+            # Remove invalid class_ids (-1)
+            valid_mask = detections.class_id != -1
+            detections = detections[valid_mask]
             
-    # Apply temporal confirmation
+            if len(detections) > 0:
+                # Apply NMS
+                detections = detections.with_nms(threshold=NMS_THRESHOLD)
+                
+                # --- SCENE-MAX LOGIC ---
+                if USE_SCENE_MAX_FALLBACK:
+                    frame_counts: Dict[str, int] = {}
+                    for i in range(len(detections)):
+                        c_id = detections.class_id[i]
+                        conf = detections.confidence[i]
+                        canonical = UNIQUE_HOUSEHOLD_OBJECTS[c_id]
+                        target_thresh = CLASS_THRESHOLDS.get(canonical, DEFAULT_THRESH)
+                        
+                        if conf >= target_thresh:
+                            frame_counts[canonical] = frame_counts.get(canonical, 0) + 1
+                        elif conf >= UNCERTAIN_THRESH:
+                            uncertain_candidates.add(canonical)
+                            
+                    for label, count in frame_counts.items():
+                        max_counts_per_class[label] = max(max_counts_per_class.get(label, 0), count)
+                        if label not in class_frame_counts:
+                            class_frame_counts[label] = set()
+                        class_frame_counts[label].add(f_idx)
+                
+                # --- BYTETRACK LOGIC ---
+                if USE_OBJECT_TRACKING and tracker:
+                    # Tracker requires detections to be updated
+                    tracked_dets = tracker.update_with_detections(detections)
+                    for i in range(len(tracked_dets)):
+                        c_id = tracked_dets.class_id[i]
+                        tracker_id = tracked_dets.tracker_id[i]
+                        conf = tracked_dets.confidence[i]
+                        canonical = UNIQUE_HOUSEHOLD_OBJECTS[c_id]
+                        target_thresh = CLASS_THRESHOLDS.get(canonical, DEFAULT_THRESH)
+                        
+                        if conf >= target_thresh:
+                            if canonical not in tracked_unique_objects:
+                                tracked_unique_objects[canonical] = set()
+                            tracked_unique_objects[canonical].add(tracker_id)
+        else:
+            if USE_OBJECT_TRACKING and tracker:
+                tracker.update_with_detections(sv.Detections.empty())
+            
+    # Resolve Final Inventory
     inventory_list = []
     uncertain_final = []
     
+    # Store dual validation data
+    validation_data = {}
+    
+    # Compile Scene-Max Results
+    scene_max_inventory = {}
     for label, count in max_counts_per_class.items():
         if len(class_frame_counts[label]) >= MIN_TEMPORAL_FRAMES:
-            inventory_list.append({
-                "name": label,
-                "quantity": count
-            })
+            scene_max_inventory[label] = count
             if label in uncertain_candidates:
                 uncertain_candidates.remove(label)
         else:
-            # Appeared but not in enough frames
             uncertain_candidates.add(label)
             
+    # Compile ByteTrack Results
+    tracking_inventory = {}
+    for label, id_set in tracked_unique_objects.items():
+        tracking_inventory[label] = len(id_set)
+        
+    # Populate inventory_list (prefer Tracking if enabled)
+    primary_inventory = tracking_inventory if USE_OBJECT_TRACKING else scene_max_inventory
+    for label, count in primary_inventory.items():
+        inventory_list.append({
+            "name": label,
+            "quantity": count
+        })
+        
     for label in uncertain_candidates:
         uncertain_final.append(label)
         
+    # Generate Comparison Logs
+    all_labels = set(scene_max_inventory.keys()).union(set(tracking_inventory.keys()))
+    for label in all_labels:
+        s_count = scene_max_inventory.get(label, 0)
+        t_count = tracking_inventory.get(label, 0)
+        validation_data[label] = {
+            "tracking_count": t_count,
+            "scene_max_count": s_count
+        }
+        if s_count != t_count:
+            logger.warning(f"Validation Discrepancy for '{label}': Tracked={t_count}, SceneMax={s_count}")
+            
     return {
         "inventory": inventory_list,
         "uncertain": uncertain_final,
         "total_frames_analyzed": total_frames_analyzed,
-        "processing_tier_breakdown": tier_counts
+        "processing_tier_breakdown": tier_counts,
+        "validation_data": validation_data
     }

@@ -60,6 +60,10 @@ def process_video_task(self, job_id: str, object_name: str):
         
         agg_result = aggregate_detections(all_detections)
         inventory = agg_result["inventory"]
+        validation_data = agg_result.get("validation_data", {})
+        
+        if validation_data:
+            logger.info("[%s] Tracking Validation Data: %s", job_id, validation_data)
 
         # Save to database
         for item in inventory:
