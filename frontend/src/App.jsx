@@ -840,7 +840,15 @@ export default function App() {
     try {
       const form = new FormData()
       form.append('file', file)
-      const res = await axios.post(`${API_BASE_URL}/api/upload`, form)
+      const res = await axios.post(`${API_BASE_URL}/api/upload`, form, {
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            // Scale upload progress (0-100%) to fit within 5% - 15% overall UI progress
+            setProgress(5 + (percentCompleted * 0.1))
+          }
+        }
+      })
       setActiveStep(2)
       setStatusMsg('Extracting frames...')
       setProgress(15)
