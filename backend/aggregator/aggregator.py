@@ -131,6 +131,14 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
                     continue
                 
                 if conf >= target_thresh or conf >= UNCERTAIN_THRESH:
+                    # Tiered Priority Boosting to force correct NMS hierarchy
+                    # Tier 1 (Highest Priority) - Structural/Large fixtures
+                    if canonical in {"chandelier", "ceiling fan", "l-shaped sofa", "bunk bed"}:
+                        conf += 2.0
+                    # Tier 2 (Medium Priority) - Specific furniture items
+                    elif canonical in {"office chair", "gaming chair", "dining chair", "bar stool", "floor lamp", "wall light", "ceiling light", "table fan", "pedestal fan", "table lamp"}:
+                        conf += 1.0
+                        
                     boxes.append(bbox)
                     confidences.append(conf)
                     try:
@@ -151,8 +159,11 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
             detections = detections[valid_mask]
             
             if len(detections) > 0:
-                # Apply NMS
-                detections = detections.with_nms(threshold=NMS_THRESHOLD)
+                # Apply class-agnostic NMS to suppress overlapping boxes of DIFFERENT classes (e.g., table lamp vs chandelier)
+                detections = detections.with_nms(threshold=NMS_THRESHOLD, class_agnostic=True)
+                
+                # Restore original confidences by removing the boost
+                detections.confidence = detections.confidence % 1.0
                 
                 # --- SCENE-MAX LOGIC ---
                 if USE_SCENE_MAX_FALLBACK:
