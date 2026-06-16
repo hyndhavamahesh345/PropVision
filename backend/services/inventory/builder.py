@@ -14,7 +14,7 @@ HOUSEHOLD_OBJECTS = [
     "drawer", "nightstand", "bench", "ottoman", "bookcase",
     "dishwasher", "dryer", "power plugs", "light switch",
     "chimney", "ac", "office chair", "dining chair", "l-shaped sofa", "gaming chair", "bar stool", "bunk bed", "furniture",
-    "diwan cot", "divan cot", "unknown object"
+    "diwan cot", "divan cot", "unknown object", "plant", "potted plant", "bottle", "mop", "broom", "bucket", "gate", "tv unit", "dressing table"
 ]
 
 UNIQUE_HOUSEHOLD_OBJECTS = sorted(list(set([
@@ -29,7 +29,8 @@ UNIQUE_HOUSEHOLD_OBJECTS = sorted(list(set([
     "pillow", "cushion", "blanket", "air conditioner", 
     "heater", "water heater", "fireplace", "staircase", "drawer", "nightstand", 
     "bench", "ottoman", "dishwasher", "dryer", 
-    "power plugs", "light switch", "chimney", "stool", "furniture", "unknown object"
+    "power plugs", "light switch", "chimney", "stool", "furniture", "unknown object",
+    "plant", "bottle", "mop", "broom", "bucket", "gate", "tv unit", "dressing table"
 ])))
 
 CANONICAL = {
@@ -46,6 +47,7 @@ CANONICAL = {
     "oven": "oven", "stove": "stove", "dishwasher": "dishwasher", "dryer": "dryer",
     "ottoman": "bench", "bench": "bench",
     "mat": "rug",
+    "potted plant": "plant",
 
     "pillow": "pillow",
     "air conditioner": "air conditioner", "heater": "heater", "water heater": "geyser", "geyser": "geyser", "ac": "air conditioner",
@@ -65,7 +67,7 @@ def normalize_object_name(raw_name: str) -> Optional[str]:
         return None
     name = str(raw_name).lower().strip()
     
-    if name in ["person", "plant", "curtain", "blinds", "potted plant", "tree", "flower", "bird", "animal", "dog", "cat", "man", "woman", "boy", "girl"]:
+    if name in ["person", "curtain", "blinds", "tree", "flower", "bird", "animal", "dog", "cat", "man", "woman", "boy", "girl"]:
         return None
 
     if name in CANONICAL:

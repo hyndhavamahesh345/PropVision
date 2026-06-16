@@ -58,6 +58,14 @@ CLASS_THRESHOLDS = {
     "dishwasher": 0.50,
     "dryer": 0.50,
     "stove": 0.50,
+    "plant": 0.30,
+    "bottle": 0.30,
+    "mop": 0.35,
+    "broom": 0.35,
+    "bucket": 0.40,
+    "gate": 0.45,
+    "tv unit": 0.45,
+    "dressing table": 0.45,
     "chimney": 0.20,
     "unknown object": 0.50
 }
