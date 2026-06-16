@@ -46,7 +46,6 @@ CANONICAL = {
     "washing machine": "washing machine", "microwave": "microwave",
     "oven": "oven", "stove": "stove", "dishwasher": "dishwasher", "dryer": "dryer",
     "ottoman": "bench", "bench": "bench",
-    "mat": "rug",
     "potted plant": "plant",
 
     "pillow": "pillow",
