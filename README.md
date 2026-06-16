@@ -57,13 +57,16 @@ Previously, the system utilized a complex 3-tier escalation engine. We have sinc
 
 ---
 
-## 🛡️ The Anti-Hallucination Aggregator
+## 🛡️ The Anti-Hallucination Aggregator & Dual-Validation Tracking
 
-Once the AI engine processes the frames, `aggregator.py` acts as a strict filter before items hit your inventory list.
+Once the AI engine processes the frames, `aggregator.py` acts as a strict filter before items hit your inventory list. It utilizes native `roboflow/supervision` pipelines to guarantee precision.
 
-1. **Size Filter:** Rejects impossibly small bounding boxes (Area < 400px).
-2. **Dynamic Confidence Thresholds:** Applies tailored strictness thresholds per item type to prevent specific hallucinations. For example, to prevent windows and light switches from being falsely identified as wall art, the threshold for `picture frame` and `painting` is aggressively tightened to 60%, while a standard `chair` only requires 35%.
-3. **Temporal Deduplication (Scene-Max):** Bounding boxes detected across multiple frames belonging to the same physical object are mathematically aggregated using maximum counts per frame rather than a running sum. This effectively prevents the system from reporting "5 refrigerators" just because a single refrigerator appeared in 5 sequential frames.
+1. **Size & Overlap Filtering:** Rejects impossibly small bounding boxes (Area < 400px) and applies Non-Maximum Suppression (NMS) via `sv.with_nms(threshold=0.45)` to clean up overlapping bounding boxes natively.
+2. **Dynamic Confidence Thresholds:** Applies tailored strictness thresholds per item type to prevent specific hallucinations. For example, to prevent windows from being falsely identified as wall art, the threshold for `picture frame` is aggressively tightened to 60%, while a standard `chair` only requires 35%.
+3. **Dual-Validation Temporal Tracking:**
+   - **ByteTrack Engine:** Uses `sv.ByteTrack` to assign unique integer `tracker_id`s to objects spanning across multiple frames, guaranteeing we don't double-count items as the camera pans back and forth.
+   - **Scene-Max Fallback:** Operates simultaneously alongside ByteTrack. Bounding boxes detected across multiple frames are aggregated using maximum counts per frame rather than a running sum.
+   - **Diagnostic Reconciliation:** The aggregator constantly compares outputs from both tracking logic pathways and logs any numerical discrepancies to the terminal for deep validation.
 
 ---
 
