@@ -7,6 +7,10 @@
     {
       "source": "/annotated_frames/:path*",
       "destination": "http://13.62.52.213:8001/annotated_frames/:path*"
+    },
+    {
+      "source": "/static/:path*",
+      "destination": "http://13.62.52.213:8001/static/:path*"
     }
   ]
 }
