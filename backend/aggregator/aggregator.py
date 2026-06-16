@@ -49,7 +49,17 @@ CLASS_THRESHOLDS = {
     "bench": 0.50,
     "rug": 0.30,
     "carpet": 0.30,
-    "mat": 0.30
+    "mat": 0.30,
+    "bulb": 0.15,
+    "light bulb": 0.15,
+    "exhaust fan": 0.15,
+    "diwan cot": 0.45,
+    "divan cot": 0.45,
+    "dishwasher": 0.50,
+    "dryer": 0.50,
+    "stove": 0.50,
+    "chimney": 0.20,
+    "unknown object": 0.50
 }
 DEFAULT_THRESH = 0.35
 UNCERTAIN_THRESH = 0.25
@@ -134,10 +144,10 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
                 if conf >= target_thresh or conf >= UNCERTAIN_THRESH:
                     # Tiered Priority Boosting to force correct NMS hierarchy
                     # Tier 1 (Highest Priority) - Structural/Large fixtures
-                    if canonical in {"chandelier", "ceiling fan", "l-shaped sofa", "bunk bed"}:
+                    if canonical in {"chandelier", "ceiling fan", "l-shaped sofa", "bunk bed", "diwan cot", "divan cot"}:
                         conf += 2.0
                     # Tier 2 (Medium Priority) - Specific furniture items
-                    elif canonical in {"office chair", "gaming chair", "dining chair", "bar stool", "floor lamp", "wall light", "ceiling light", "table fan", "pedestal fan", "table lamp"}:
+                    elif canonical in {"office chair", "gaming chair", "dining chair", "bar stool", "floor lamp", "wall light", "ceiling light", "table fan", "pedestal fan", "exhaust fan", "table lamp"}:
                         conf += 1.0
                         
                     boxes.append(bbox)

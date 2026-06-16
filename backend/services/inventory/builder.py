@@ -4,33 +4,32 @@ from typing import Optional, List, Dict
 HOUSEHOLD_OBJECTS = [
     "sofa", "couch", "chair", "armchair", "table", "dining table", "coffee table", "meeting table", "conference table",
     "desk", "tv", "television", "monitor", "bed", "mattress", "wardrobe", "closet",
-    "cabinet", "cupboard", "refrigerator", "fridge", "fan", "ceiling fan", "table fan", "pedestal fan", "light",
-    "lamp", "chandelier", "floor lamp", "table lamp", "wall light", "ceiling light",
+    "cabinet", "cupboard", "refrigerator", "fridge", "fan", "ceiling fan", "table fan", "pedestal fan", "exhaust fan", "light",
+    "lamp", "chandelier", "floor lamp", "table lamp", "wall light", "ceiling light", "bulb", "light bulb",
     "door", "window", "shelf", "bookshelf", "rack",
     "clock", "rug", "carpet",
     "washing machine", "microwave", "oven", "stove", "sink", "toilet", "bathtub",
     "shower", "mirror", "pillow", "cushion",
     "blanket", "air conditioner", "heater", "water heater", "geyser", "fireplace", "staircase",
-    "drawer", "nightstand", "bench", "ottoman", "bookcase", "kettle",
-    "toaster", "dishwasher", "dryer", "iron", "vacuum", "printer",
-    "speaker", "router", "phone", "laptop", "computer", "power plugs", "light switch",
-    "projector", "chimney", "ac", "office chair", "dining chair", "l-shaped sofa", "gaming chair", "bar stool", "bunk bed", "furniture"
+    "drawer", "nightstand", "bench", "ottoman", "bookcase",
+    "dishwasher", "dryer", "power plugs", "light switch",
+    "chimney", "ac", "office chair", "dining chair", "l-shaped sofa", "gaming chair", "bar stool", "bunk bed", "furniture",
+    "diwan cot", "divan cot", "unknown object"
 ]
 
 UNIQUE_HOUSEHOLD_OBJECTS = sorted(list(set([
     "sofa", "l-shaped sofa", "chair", "armchair", "office chair", "dining chair", "gaming chair", "bar stool", 
     "table", "dining table", "coffee table", "meeting table", "conference table", "desk", 
-    "tv", "bed", "bunk bed", "wardrobe", "closet", "cabinet", "cupboard", 
-    "refrigerator", "fan", "ceiling fan", "table fan", "pedestal fan", 
-    "light", "lamp", "chandelier", "floor lamp", "table lamp", "wall light", "ceiling light",
+    "tv", "bed", "bunk bed", "diwan cot", "divan cot", "wardrobe", "closet", "cabinet", "cupboard", 
+    "refrigerator", "fan", "ceiling fan", "table fan", "pedestal fan", "exhaust fan",
+    "light", "lamp", "chandelier", "floor lamp", "table lamp", "wall light", "ceiling light", "bulb", "light bulb",
     "door", "window", "shelf", "bookshelf", "clock", "rug", "carpet",
     "washing machine", "microwave", "oven", "stove", 
     "sink", "toilet", "bathtub", "shower", "mirror", 
     "pillow", "cushion", "blanket", "air conditioner", 
     "heater", "water heater", "fireplace", "staircase", "drawer", "nightstand", 
-    "bench", "ottoman", "kettle", "toaster", "dishwasher", "dryer", 
-    "iron", "vacuum", "printer", "speaker", "router", "phone", "laptop", 
-    "computer", "power plugs", "light switch", "projector", "chimney", "stool", "furniture"
+    "bench", "ottoman", "dishwasher", "dryer", 
+    "power plugs", "light switch", "chimney", "stool", "furniture", "unknown object"
 ])))
 
 CANONICAL = {
@@ -44,9 +43,7 @@ CANONICAL = {
     "fridge": "refrigerator", "freezer": "refrigerator",
     "bookshelf": "shelf", "bookcase": "shelf", "rack": "shelf",
     "washing machine": "washing machine", "microwave": "microwave",
-    "oven": "oven", "stove": "stove", "kettle": "kettle",
-    "toaster": "toaster", "dishwasher": "dishwasher", "dryer": "dryer",
-    "iron": "iron", "vacuum": "vacuum",
+    "oven": "oven", "stove": "stove", "dishwasher": "dishwasher", "dryer": "dryer",
     "ottoman": "bench", "bench": "bench",
     "mat": "rug",
 
@@ -59,7 +56,8 @@ CANONICAL = {
     "door handle": "door", "door knob": "door", "door frame": "door", "doorframe": "door",
     "window frame": "window",
     "sink faucet": "sink", "faucet": "sink", "tap": "sink", "kitchen sink": "sink", "bathroom sink": "sink",
-    "projector": "projector", "chimney": "chimney",
+    "chimney": "chimney",
+    "light bulb": "bulb"
 }
 
 def normalize_object_name(raw_name: str) -> Optional[str]:
@@ -67,7 +65,7 @@ def normalize_object_name(raw_name: str) -> Optional[str]:
         return None
     name = str(raw_name).lower().strip()
     
-    if name == "person" or name == "plant" or name == "curtain" or name == "blinds" or name == "potted plant":
+    if name in ["person", "plant", "curtain", "blinds", "potted plant", "tree", "flower", "bird", "animal", "dog", "cat", "man", "woman", "boy", "girl"]:
         return None
 
     if name in CANONICAL:
