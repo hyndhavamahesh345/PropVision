@@ -81,7 +81,7 @@ CLASS_THRESHOLDS = {
 }
 DEFAULT_THRESH = 0.35
 UNCERTAIN_THRESH = 0.25
-MIN_TEMPORAL_FRAMES = 2
+MIN_TEMPORAL_FRAMES = 1
 
 def compute_iou(box1, box2):
     x1 = max(box1[0], box2[0])
@@ -271,7 +271,7 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
         "dining table": ["table"],
         "desk": ["table"],
         "ceiling fan": ["fan"],
-        "pedestal fan": ["fan", "wall fan"],
+        "pedestal fan": ["fan"],
         "wall fan": ["fan"],
         "exhaust fan": ["fan"],
         "bunk bed": ["bed"],
