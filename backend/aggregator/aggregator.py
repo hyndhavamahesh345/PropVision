@@ -188,8 +188,8 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
             detections = detections[valid_mask]
             
             if len(detections) > 0:
-                # Apply class-agnostic NMS to suppress overlapping boxes of DIFFERENT classes (e.g., table lamp vs chandelier)
-                detections = detections.with_nms(threshold=NMS_THRESHOLD, class_agnostic=True)
+                # Apply NMS to suppress overlapping boxes. Set class_agnostic=False to prevent suppressing different objects (e.g. fan vs light).
+                detections = detections.with_nms(threshold=0.50, class_agnostic=False)
                 
                 # Restore original confidences by removing the boost
                 detections.confidence = detections.confidence % 1.0
