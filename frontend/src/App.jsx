@@ -85,8 +85,8 @@ function getItemCategory(name) {
 
 function getItemIcon(name) {
   const n = name.toLowerCase()
-  if (n.includes('sofa') || n.includes('couch'))                    return <Sofa       className="w-4 h-4 text-indigo-400" />
-  if (n.includes('chair') || n.includes('bench') || n.includes('ottoman')) return <Sofa className="w-4 h-4 text-indigo-400" />
+  if (n.includes('sofa') || n.includes('couch'))                    return <Sofa       className="w-4 h-4 text-orange-500" />
+  if (n.includes('chair') || n.includes('bench') || n.includes('ottoman')) return <Sofa className="w-4 h-4 text-orange-500" />
   if (n.includes('tv') || n.includes('television') || n.includes('monitor')) return <Tv className="w-4 h-4 text-blue-400" />
   if (n.includes('bed') || n.includes('mattress'))                  return <Bed        className="w-4 h-4 text-purple-400" />
   if (n.includes('light') || n.includes('lamp') || n.includes('chandelier') || n.includes('bulb'))
@@ -111,128 +111,104 @@ function formatTime(totalSeconds) {
 // ── Sub-Components ─────────────────────────────────────────────────────────────
 
 /** Animated background orbs + grid */
-function BackgroundFX() {
+
+
+/** Global sticky header */
+
+
+/** Upload tab — drag/drop or file picker */
+
+
+/** Live camera recording tab */
+
+function LogoIcon() {
   return (
-    <div className="pointer-events-none select-none" aria-hidden>
-      {/* Gradient orbs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[560px] overflow-hidden opacity-25">
-        <div className="absolute -top-[15%] left-[18%] w-[480px] h-[480px] rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 blur-[140px] animate-pulse-slow" />
-        <div className="absolute -top-[8%]  right-[12%] w-[420px] h-[420px] rounded-full bg-gradient-to-br from-indigo-500 to-emerald-500 blur-[120px] opacity-70" />
+    <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center shadow-md shadow-orange-500/20 shrink-0">
+      <div className="grid grid-cols-2 gap-1 w-4 h-4">
+        <div className="bg-white rounded-[3px]" />
+        <div className="bg-white rounded-[3px]" />
+        <div className="bg-white rounded-[3px]" />
+        <div className="bg-white rounded-[3px]" />
       </div>
-      {/* Dot-grid overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle,#1e293b_1px,transparent_1px)] [background-size:32px_32px] opacity-20 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
     </div>
   )
 }
 
-/** Global sticky header */
-function Header({ pipeline, onReset }) {
+function Header({ onReset }) {
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-2xl bg-slate-950/70 border-b border-slate-800/60 shadow-lg">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-5 md:px-10 py-3.5">
-        {/* Logo */}
-        <button
-          onClick={onReset}
-          className="flex items-center gap-3 group outline-none"
-          aria-label="Go to home"
-        >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300">
-            <Home className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-left">
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-slate-100 via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
-                VisionVault
-              </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 leading-none">
-                AI
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-500 font-medium tracking-wide leading-none mt-0.5">
-              Property Inventory Intelligence
-            </p>
-          </div>
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-orange-500/10">
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+        <button onClick={onReset} className="flex items-center gap-3 outline-none group">
+          <LogoIcon />
+          <span className="font-extrabold text-xl tracking-tight text-slate-900 group-hover:text-orange-500 transition-colors">
+            VisionVault
+          </span>
         </button>
-
-        {/* Status badges */}
-        <div className="flex items-center gap-3">
-          <span className="hidden md:flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-slate-300">
-            <Sparkles className="w-3 h-3 text-indigo-400" style={{ animation: 'spin 4s linear infinite' }} />
-            {pipeline
-              ? pipeline.includes('hybrid') || pipeline.includes('yolo')
-                ? '3-Tier Hybrid AI'
-                : 'AI Vision'
-              : '3-Tier Hybrid AI'}
-          </span>
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-          </span>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
+          <button className="hover:text-slate-900 transition-colors">How it works</button>
+          <button className="hover:text-slate-900 transition-colors">Pricing</button>
+          <button className="hover:text-slate-900 transition-colors">Docs</button>
+        </nav>
+        <div className="flex items-center gap-4">
+          <button className="text-sm font-bold text-slate-900 border border-slate-200 rounded-full px-5 py-2 hover:bg-slate-50 transition-colors flex items-center gap-2">
+            Get started &rarr;
+          </button>
         </div>
       </div>
     </header>
   )
 }
 
-/** Upload tab — drag/drop or file picker */
-function UploadDropzone({ onFile }) {
-  const [isDragging, setIsDragging] = useState(false)
-  const inputRef = useRef(null)
-
-  const handleDrop = useCallback(
-    (e) => {
-      e.preventDefault()
-      setIsDragging(false)
-      const f = e.dataTransfer.files[0]
-      if (f) onFile(f)
-    },
-    [onFile]
-  )
-
+function LandingPage({ onStartUpload, onStartRecord }) {
   return (
-    <div
-      onDrop={handleDrop}
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-      onDragLeave={() => setIsDragging(false)}
-      onClick={() => inputRef.current?.click()}
-      className={[
-        'group relative flex flex-col items-center justify-center',
-        'border-2 border-dashed rounded-2xl p-10 md:p-16 text-center cursor-pointer',
-        'transition-all duration-300 overflow-hidden',
-        isDragging
-          ? 'border-indigo-500 bg-indigo-950/20 scale-[1.01]'
-          : 'border-slate-800 bg-slate-950/20 hover:border-slate-700 hover:bg-slate-900/10',
-      ].join(' ')}
-    >
-      {/* Hover gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-      <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-indigo-500/40 group-hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.2)] transition-all duration-300">
-        <UploadCloud className="w-7 h-7 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
-      </div>
-
-      <h3 className="text-lg font-bold text-slate-200 mb-2">
-        {isDragging ? 'Drop to scan →' : 'Drag & drop your walkthrough video'}
-      </h3>
-      <p className="text-xs text-slate-500 max-w-xs mx-auto mb-6 leading-relaxed">
-        Or click to browse files. Supports MP4, WebM, MOV, AVI — up to 500 MB.
+    <div className="w-full flex flex-col items-center pt-24 pb-16 px-6 relative text-center">
+      <h1 className="text-5xl md:text-[76px] font-black tracking-tighter text-slate-900 leading-[1.1] mb-8">
+        Your home,<br/>
+        <span className="text-orange-500">fully inventoried.</span><br/>
+        <span className="tracking-tighter">In minutes.</span>
+      </h1>
+      <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto font-medium mb-12">
+        Upload a walkthrough video or go live with your webcam.<br className="hidden md:block" />
+        VisionVault's AI detects and catalogs every item in every<br className="hidden md:block" />
+        room — automatically.
       </p>
-      <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
-        HIGH-FIDELITY PREVIEW SUPPORTED
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+        <button onClick={onStartUpload} className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 rounded-full border border-slate-200 hover:border-slate-300 bg-white text-slate-900 font-bold text-lg transition-all shadow-sm hover:shadow-md">
+          <Download className="w-5 h-5 rotate-180 text-slate-900" />
+          Upload video
+        </button>
+        <button onClick={onStartRecord} className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 rounded-full border border-slate-200 hover:border-slate-300 bg-white text-slate-900 font-bold text-lg transition-all shadow-sm hover:shadow-md">
+          <div className="w-5 h-5 rounded-full border-2 border-slate-900 flex items-center justify-center p-0.5"><div className="w-full h-full bg-slate-900 rounded-full" /></div>
+          Record walkthrough
+        </button>
       </div>
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept="video/*"
-        className="hidden"
-        onChange={(e) => e.target.files[0] && onFile(e.target.files[0])}
-      />
     </div>
   )
 }
 
-/** Live camera recording tab */
+function UploadDropzone({ onFile, onRecord }) {
+  const inputRef = React.useRef(null)
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto w-full">
+      <div onClick={() => inputRef.current?.click()} className="relative flex flex-col items-center justify-center border border-orange-500 rounded-3xl p-10 cursor-pointer bg-white hover:bg-orange-50/30 transition-all text-center h-72 shadow-sm group">
+        <div className="absolute top-4 right-4 bg-orange-500 text-slate-900 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">Popular</div>
+        <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><Download className="w-7 h-7 rotate-180 text-orange-500" /></div>
+        <h3 className="text-xl font-black text-slate-900 mb-2">Upload video</h3>
+        <p className="text-sm text-slate-500 font-medium">MP4, MOV, AVI, WebM<br/>Up to 500 MB</p>
+        <div className="mt-8 font-bold text-orange-500 flex items-center gap-1 text-sm">Get started &rarr;</div>
+      </div>
+      <div onClick={onRecord} className="relative flex flex-col items-center justify-center border border-orange-500 rounded-3xl p-10 cursor-pointer bg-white hover:bg-orange-50/30 transition-all text-center h-72 shadow-sm group">
+        <div className="absolute top-4 right-4 bg-orange-500 text-slate-900 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">Live</div>
+        <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><div className="w-6 h-6 rounded-full border-2 border-orange-500 flex items-center justify-center p-0.5"><div className="w-full h-full bg-orange-500 rounded-full" /></div></div>
+        <h3 className="text-xl font-black text-slate-900 mb-2">Record now</h3>
+        <p className="text-sm text-slate-500 font-medium">Use your webcam<br/>Live walkthrough</p>
+        <div className="mt-8 font-bold text-orange-500 flex items-center gap-1 text-sm">Get started &rarr;</div>
+      </div>
+      <input ref={inputRef} type="file" accept="video/*" className="hidden" onChange={(e) => e.target.files[0] && onFile(e.target.files[0])} />
+    </div>
+  )
+}
+
 function CameraRecorder({ onVideoReady, onCancel }) {
   const [mediaStream, setMediaStream] = useState(null)
   const [mediaRecorder, setMediaRecorder] = useState(null)
@@ -316,7 +292,7 @@ function CameraRecorder({ onVideoReady, onCancel }) {
           </button>
           <button
             onClick={cancel}
-            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-400 transition-all"
+            className="px-4 py-2 rounded-lg bg-slate-50 hover:bg-slate-800 border border-slate-200 text-xs font-bold text-slate-400 transition-all"
           >
             Cancel
           </button>
@@ -329,16 +305,16 @@ function CameraRecorder({ onVideoReady, onCancel }) {
     return (
       <div
         onClick={startCamera}
-        className="flex flex-col items-center justify-center py-14 px-6 cursor-pointer rounded-2xl border-2 border-dashed border-slate-800 hover:border-indigo-500/40 hover:bg-slate-900/10 transition-all duration-300 animate-fade-in"
+        className="flex flex-col items-center justify-center py-14 px-6 cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-500/40 hover:bg-slate-50/10 transition-all duration-300 animate-fade-in"
       >
-        <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-6">
-          <Video className="w-6 h-6 text-indigo-400" />
+        <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center mb-6">
+          <Video className="w-6 h-6 text-orange-500" />
         </div>
-        <h3 className="text-lg font-bold text-slate-200 mb-2">Enable Device Camera</h3>
-        <p className="text-xs text-slate-500 max-w-sm mb-6 text-center leading-relaxed">
+        <h3 className="text-lg font-bold text-slate-900 mb-2">Enable Device Camera</h3>
+        <p className="text-xs text-slate-400 max-w-sm mb-6 text-center leading-relaxed">
           Grant camera & microphone access to record a property walkthrough directly in the platform.
         </p>
-        <button className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-lg shadow-indigo-500/20 transition-all duration-200">
+        <button className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-500 font-bold text-xs text-slate-900 shadow-lg shadow-orange-500/20 transition-all duration-200">
           Initialize Camera
         </button>
       </div>
@@ -346,16 +322,16 @@ function CameraRecorder({ onVideoReady, onCancel }) {
   }
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-black border border-slate-800/90 aspect-video shadow-2xl animate-fade-in">
+    <div className="relative rounded-2xl overflow-hidden bg-black border border-slate-200/90 aspect-video shadow-2xl animate-fade-in">
       {/* Status badge */}
       <div className="absolute top-4 left-4 z-10">
         {isRecording ? (
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-rose-600/90 backdrop-blur-md text-white text-[11px] font-extrabold shadow-lg tracking-wider">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-rose-600/90 backdrop-blur-md text-slate-900 text-[11px] font-extrabold shadow-lg tracking-wider">
             <span className="w-2 h-2 rounded-full bg-white animate-ping" />
             REC {formatTime(seconds)}
           </div>
         ) : (
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-600/90 backdrop-blur-md text-white text-[11px] font-extrabold shadow-lg tracking-wider">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-600/90 backdrop-blur-md text-slate-900 text-[11px] font-extrabold shadow-lg tracking-wider">
             LIVE
           </div>
         )}
@@ -367,14 +343,14 @@ function CameraRecorder({ onVideoReady, onCancel }) {
       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent p-5 flex items-center justify-between">
         <button
           onClick={cancel}
-          className="px-4 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 transition-all"
+          className="px-4 py-2 rounded-lg bg-slate-50/90 hover:bg-slate-800 border border-slate-200 text-xs font-bold text-slate-800 transition-all"
         >
           Cancel
         </button>
         {!isRecording ? (
           <button
             onClick={startRecording}
-            className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-lg shadow-rose-500/20 flex items-center gap-2 hover:scale-105 transition-all duration-200"
+            className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-500 text-slate-900 font-extrabold text-xs shadow-lg shadow-rose-500/20 flex items-center gap-2 hover:scale-105 transition-all duration-200"
           >
             <span className="w-2 h-2 rounded-full bg-white" />
             Start Recording
@@ -382,7 +358,7 @@ function CameraRecorder({ onVideoReady, onCancel }) {
         ) : (
           <button
             onClick={stopRecording}
-            className="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-2 hover:scale-105 transition-all duration-200"
+            className="px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-extrabold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-2 hover:scale-105 transition-all duration-200"
           >
             ⏹ Stop & Save
           </button>
@@ -396,20 +372,20 @@ function CameraRecorder({ onVideoReady, onCancel }) {
 /** Processing progress panel */
 function ProgressPanel({ statusMsg, progress, activeStep }) {
   return (
-    <div className="mt-8 p-6 rounded-2xl bg-slate-950/50 border border-slate-800/80 shadow-inner animate-fade-in">
+    <div className="mt-8 p-6 rounded-2xl bg-white/50 border border-slate-200/80 shadow-inner animate-fade-in">
       {/* Label + percentage */}
       <div className="flex items-center justify-between mb-3">
-        <span className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
+        <span className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+          <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
           {statusMsg}
         </span>
-        <span className="text-xs font-extrabold text-indigo-400 tabular-nums">
+        <span className="text-xs font-extrabold text-orange-500 tabular-nums">
           {Math.round(progress)}%
         </span>
       </div>
 
       {/* Progress bar */}
-      <div className="relative w-full h-1.5 rounded-full bg-slate-900 border border-slate-800/50 overflow-hidden mb-6">
+      <div className="relative w-full h-1.5 rounded-full bg-slate-50 border border-slate-200/50 overflow-hidden mb-6">
         <div
           className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-400 transition-all duration-500 ease-out relative overflow-hidden"
           style={{ width: `${progress}%` }}
@@ -428,8 +404,8 @@ function ProgressPanel({ statusMsg, progress, activeStep }) {
               key={idx}
               className={[
                 'flex flex-col items-center gap-1 p-2.5 rounded-xl border text-center transition-all duration-300',
-                done    ? 'bg-indigo-950/20 border-indigo-500/25 text-indigo-400'
-                : current ? 'bg-slate-900/60 border-slate-700/60 text-indigo-300 shadow-[0_0_15px_-5px_rgba(99,102,241,0.15)]'
+                done    ? 'bg-orange-50/20 border-indigo-500/25 text-orange-500'
+                : current ? 'bg-slate-50/60 border-slate-700/60 text-orange-600 shadow-[0_0_15px_-5px_rgba(99,102,241,0.15)]'
                 : 'bg-transparent border-transparent text-slate-600',
               ].join(' ')}
             >
@@ -465,7 +441,7 @@ function StatsGrid({ inventory }) {
       value:    uniqueTypes,
       label:    'Unique Types',
       color:    'from-indigo-600/10 to-purple-600/10 border-indigo-500/20',
-      icon:     <Layers className="w-4 h-4 text-indigo-400" />,
+      icon:     <Layers className="w-4 h-4 text-orange-500" />,
     },
     {
       value:    frames,
@@ -490,12 +466,12 @@ function StatsGrid({ inventory }) {
           style={{ animationDelay: `${i * 60}ms` }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
               {s.label}
             </span>
             {s.icon}
           </div>
-          <span className="text-3xl font-extrabold tracking-tight text-slate-100">
+          <span className="text-3xl font-extrabold tracking-tight text-slate-900">
             {s.value}
           </span>
         </div>
@@ -507,17 +483,17 @@ function StatsGrid({ inventory }) {
 /** Single inventory row */
 function InventoryRow({ item, onAdjust, onRemove }) {
   return (
-    <div className="grid grid-cols-12 gap-2 px-5 py-3.5 items-center hover:bg-slate-900/20 transition-colors">
+    <div className="grid grid-cols-12 gap-2 px-5 py-3.5 items-center hover:bg-slate-50/20 transition-colors">
       {/* Item info */}
       <div className="col-span-6 md:col-span-7 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-950 border border-slate-900 flex items-center justify-center shrink-0 shadow-inner">
+        <div className="w-9 h-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-inner">
           {getItemIcon(item.name)}
         </div>
         <div className="min-w-0">
-          <p className="font-bold text-sm text-slate-200 capitalize truncate">
+          <p className="font-bold text-sm text-slate-900 capitalize truncate">
             {item.name}
           </p>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-800/60 font-semibold uppercase tracking-wide">
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400 border border-slate-200/60 font-semibold uppercase tracking-wide">
             {getItemCategory(item.name)}
           </span>
         </div>
@@ -525,7 +501,7 @@ function InventoryRow({ item, onAdjust, onRemove }) {
 
       {/* Quantity badge */}
       <div className="col-span-3 flex justify-center">
-        <span className="inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-sm font-extrabold text-indigo-400 tabular-nums">
+        <span className="inline-flex items-center justify-center min-w-[2.25rem] h-7 px-2 rounded-lg bg-orange-500/10 border border-indigo-500/20 text-sm font-extrabold text-orange-500 tabular-nums">
           {item.quantity}
         </span>
       </div>
@@ -534,14 +510,14 @@ function InventoryRow({ item, onAdjust, onRemove }) {
       <div className="col-span-3 md:col-span-2 flex items-center justify-end gap-1">
         <button
           onClick={() => onAdjust(-1)}
-          className="w-7 h-7 rounded-lg bg-slate-950 hover:bg-slate-900 border border-slate-900 hover:border-slate-700 flex items-center justify-center text-slate-500 hover:text-indigo-400 transition-all active:scale-90"
+          className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 border border-slate-100 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all active:scale-90"
           title="Decrease"
         >
           <Minus className="w-3 h-3" />
         </button>
         <button
           onClick={() => onAdjust(1)}
-          className="w-7 h-7 rounded-lg bg-slate-950 hover:bg-slate-900 border border-slate-900 hover:border-slate-700 flex items-center justify-center text-slate-500 hover:text-indigo-400 transition-all active:scale-90"
+          className="w-7 h-7 rounded-lg bg-white hover:bg-slate-50 border border-slate-100 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all active:scale-90"
           title="Increase"
         >
           <Plus className="w-3 h-3" />
@@ -570,29 +546,29 @@ function AdvisoryPanel({ inventory }) {
   })).filter(c => c.count > 0)
 
   return (
-    <div className="space-y-5 p-6 md:p-7 rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/90 shadow-md relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-indigo-500/5 blur-2xl pointer-events-none" />
+    <div className="space-y-5 p-6 md:p-7 rounded-3xl bg-slate-50/40 backdrop-blur-xl border border-slate-200/90 shadow-md relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-orange-500/5 blur-2xl pointer-events-none" />
 
-      <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-indigo-400" />
+      <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-orange-500" />
         AI Smart Advisory
       </h2>
 
       {/* Insight cards */}
-      <div className="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-900/20 flex gap-3 text-xs leading-relaxed text-slate-400">
-        <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-xl bg-orange-50/20 border border-indigo-900/20 flex gap-3 text-xs leading-relaxed text-slate-400">
+        <Sparkles className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
         <p>
-          <span className="font-bold text-slate-200">Asset Alert: </span>
+          <span className="font-bold text-slate-900">Asset Alert: </span>
           High concentration of{' '}
-          <span className="text-indigo-300 font-semibold">Furniture</span> detected.
+          <span className="text-orange-600 font-semibold">Furniture</span> detected.
           Consider adding condition labels to high-value pieces.
         </p>
       </div>
 
-      <div className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-900 flex gap-3 text-xs leading-relaxed text-slate-400">
-        <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-xl bg-white/40 border border-slate-100 flex gap-3 text-xs leading-relaxed text-slate-400">
+        <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
         <p>
-          <span className="font-bold text-slate-200">Scan Quality: </span>
+          <span className="font-bold text-slate-900">Scan Quality: </span>
           Frame extraction generated{' '}
           <span className="text-emerald-400 font-semibold">99% blur-free</span>{' '}
           analysis checkpoints.
@@ -601,8 +577,8 @@ function AdvisoryPanel({ inventory }) {
 
       {/* Category breakdown bars */}
       {cats.length > 0 && (
-        <div className="border-t border-slate-800/60 pt-4 space-y-3">
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block">
+        <div className="border-t border-slate-200/60 pt-4 space-y-3">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">
             Category Share
           </span>
           {cats.map((cat, i) => {
@@ -611,9 +587,9 @@ function AdvisoryPanel({ inventory }) {
               <div key={i} className="space-y-1">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="font-semibold text-slate-400">{cat.name}</span>
-                  <span className="text-slate-500 tabular-nums">{cat.count} ({pct}%)</span>
+                  <span className="text-slate-400 tabular-nums">{cat.count} ({pct}%)</span>
                 </div>
-                <div className="h-1 w-full bg-slate-950 rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-white rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-700"
                     style={{ width: `${pct}%` }}
@@ -644,15 +620,15 @@ function AddItemForm({ onAdd }) {
   }
 
   return (
-    <div className="p-6 md:p-7 rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/90 shadow-md">
-      <h2 className="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
-        <Plus className="w-4 h-4 text-indigo-400" />
+    <div className="p-6 md:p-7 rounded-3xl bg-slate-50/40 backdrop-blur-xl border border-slate-200/90 shadow-md">
+      <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <Plus className="w-4 h-4 text-orange-500" />
         Add Missing Item
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block mb-1.5">
+          <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block mb-1.5">
             Item Name
           </label>
           <input
@@ -661,13 +637,13 @@ function AddItemForm({ onAdd }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Dining Chair"
             required
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block mb-1.5">
               Quantity
             </label>
             <input
@@ -677,18 +653,18 @@ function AddItemForm({ onAdd }) {
               value={qty}
               onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
               required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div>
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block mb-1.5">
               Room
             </label>
             <select
               value={room}
               onChange={(e) => setRoom(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium text-slate-900 focus:outline-none focus:border-indigo-500 transition-colors"
             >
               {ROOMS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
@@ -697,7 +673,7 @@ function AddItemForm({ onAdd }) {
 
         <button
           type="submit"
-          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-md shadow-indigo-500/10 flex items-center justify-center gap-1.5 transition-all"
+          className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-500 font-bold text-xs text-slate-900 shadow-md shadow-orange-500/10 flex items-center justify-center gap-1.5 transition-all"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Item
@@ -798,6 +774,8 @@ export default function App() {
 
   // Results state
   const [inventory, setInventory] = useState(null)
+  const [isLanding, setIsLanding] = useState(true)
+  const hiddenFileRef = useRef(null)
 
   // Dashboard state
   const [searchQuery,       setSearchQuery]       = useState('')
@@ -908,6 +886,7 @@ export default function App() {
   // ── Reset ──────────────────────────────────────────────────────────────────
 
   const reset = () => {
+    setIsLanding(true)
     setFile(null)
     setPreviewUrl(null)
     setInventory(null)
@@ -992,88 +971,67 @@ export default function App() {
     })
   }, [inventory, searchQuery, selectedCategory])
 
-  const groupedInventory = useMemo(() => {
-    const groups = {}
-    filteredInventory.forEach(item => {
-      const room = item.room || 'Unknown Room'
-      if (!groups[room]) groups[room] = []
-      groups[room].push(item)
-    })
-    return groups
-  }, [filteredInventory])
-
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="relative min-h-screen bg-[#030712] text-slate-100 overflow-x-hidden">
-      <BackgroundFX />
-      <Header pipeline={inventory?.pipeline} onReset={reset} />
+    <div className="relative min-h-screen bg-white text-slate-900 overflow-x-hidden">
+      
+      {/* Hidden file input for Landing Page direct upload */}
+      <input ref={hiddenFileRef} type="file" accept="video/*" className="hidden" onChange={(e) => {
+        if (e.target.files[0]) {
+          setIsLanding(false)
+          handleFile(e.target.files[0])
+        }
+      }} />
 
-      <main className="relative max-w-5xl mx-auto px-5 md:px-8 py-12 md:py-20 z-10">
+      {isLanding && !file && !inventory && (
+        <>
+          <Header onReset={reset} />
+          <LandingPage 
+            onStartUpload={() => hiddenFileRef.current?.click()} 
+            onStartRecord={() => setIsLanding(false)} 
+          />
+        </>
+      )}
 
-        {/* ── UPLOAD / PROCESSING VIEW ──────────────────────────────────── */}
-        {!inventory && (
-          <div className="animate-fade-in">
-            {/* Hero */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/40 border border-indigo-800/40 text-[11px] font-semibold text-indigo-300 mb-6">
-                <Sparkles className="w-3 h-3 text-indigo-400" />
-                Next-Gen AI Walkthrough Scanner
+      {(!isLanding || file || inventory) && (
+        <div className="w-full max-w-5xl mx-auto mt-8 border border-orange-500/10 rounded-[32px] bg-orange-50/50 p-2 md:p-4 shadow-sm mb-16">
+          <div className="w-full rounded-[24px] bg-white border border-slate-100 shadow-sm overflow-hidden min-h-[600px]">
+            {/* Browser Header Mockup */}
+            <div className="bg-orange-50/40 border-b border-orange-500/10 px-4 py-3 flex items-center gap-4">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-amber-400" />
+                <div className="w-3 h-3 rounded-full bg-emerald-400" />
               </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-5 leading-[1.08]">
-                Property Inventory
-                <br />
-                <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-indigo-200 bg-clip-text text-transparent text-glow">
-                  Decoded instantly.
-                </span>
-              </h1>
-              <p className="text-sm md:text-base text-slate-400 max-w-lg mx-auto leading-relaxed">
-                Upload a walkthrough video. Our AI automatically detects, tracks, and groups every item by room — then generates a professional PDF report.
-              </p>
+              <div className="flex-1 max-w-md mx-auto bg-orange-500/10 rounded-lg py-1.5 text-center text-[11px] font-bold tracking-widest text-orange-600">
+                app.visionvault.ai
+              </div>
+              <div className="w-12"></div>
+            </div>
+            {/* App Navbar */}
+            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <LogoIcon />
+                <span className="font-extrabold text-lg text-slate-900">VisionVault</span>
+              </div>
+              <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-500">
+                <span className="text-orange-500 bg-orange-50 px-4 py-1.5 rounded-full">Home</span>
+                <span>Analytics</span>
+                <span>Inventory</span>
+                <span>Export</span>
+              </div>
             </div>
 
-            {/* Main card */}
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-3xl overflow-hidden shadow-[0_0_60px_-15px_rgba(99,102,241,0.12)] glow-border">
-              {/* Card top bar */}
-              <div className="px-5 py-3.5 border-b border-slate-800/70 flex items-center justify-between bg-slate-950/40">
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-rose-500/80" />
-                  <span className="w-3 h-3 rounded-full bg-amber-500/80" />
-                  <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                  <span className="text-xs font-medium text-slate-600 ml-2 font-mono">visionvault.ai</span>
-                </div>
-
-                {/* Tab switcher — only shown before file is selected */}
-                {!previewUrl && !isProcessing && (
-                  <div className="flex items-center bg-slate-950/60 p-0.5 rounded-lg border border-slate-800/80">
-                    {[
-                      { id: 'upload', icon: <UploadCloud className="w-3 h-3" />, label: 'Upload File' },
-                      { id: 'record', icon: <Video className="w-3 h-3" />,       label: 'Live Camera' },
-                    ].map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={[
-                          'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200',
-                          activeTab === tab.id
-                            ? 'bg-indigo-600 text-white shadow'
-                            : 'text-slate-500 hover:text-slate-300',
-                        ].join(' ')}
-                      >
-                        {tab.icon}
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Card body */}
-              <div className="p-6 md:p-10">
+            {/* App Content Area */}
+            <div className="p-8 md:p-12">
+              {/* UPLOAD / PROCESSING VIEW */}
+              {!inventory && (
+                <div className="animate-fade-in">
 
                 {/* Upload dropzone */}
                 {!previewUrl && activeTab === 'upload' && (
-                  <UploadDropzone onFile={handleFile} />
+                  <UploadDropzone onFile={handleFile} onRecord={() => setActiveTab('record')} />
                 )}
 
                 {/* Live camera */}
@@ -1086,9 +1044,9 @@ export default function App() {
 
                 {/* Video preview */}
                 {previewUrl && (
-                  <div className="rounded-2xl border border-slate-800/80 bg-slate-950/60 overflow-hidden shadow-lg animate-fade-in">
-                    <div className="px-5 py-3 border-b border-slate-900 flex items-center justify-between bg-slate-950/40">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 min-w-0">
+                  <div className="rounded-2xl border border-slate-200/80 bg-white/60 overflow-hidden shadow-lg animate-fade-in">
+                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-white/40">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-orange-500 min-w-0">
                         <FileVideo className="w-4 h-4 shrink-0" />
                         <span className="truncate">{file?.name}</span>
                         <span className="text-slate-600 shrink-0">
@@ -1113,7 +1071,7 @@ export default function App() {
                 {file && !isProcessing && (
                   <button
                     onClick={handleUpload}
-                    className="w-full py-4 mt-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-extrabold text-sm text-white shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2.5 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 animate-fade-in"
+                    className="w-full py-4 mt-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-extrabold text-sm text-slate-900 shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2.5 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 animate-fade-in"
                   >
                     <Sparkles className="w-4 h-4" />
                     Begin AI Scan Analysis
@@ -1131,22 +1089,20 @@ export default function App() {
 
                 {/* Error banner */}
                 {error && (
-                  <div className="mt-6 p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 flex items-center justify-between gap-3 animate-fade-in">
+                  <div className="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between gap-3 animate-fade-in">
                     <div className="flex items-center gap-3">
                       <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
-                      <p className="text-sm text-rose-400 font-medium">{error}</p>
+                      <p className="text-sm text-rose-600 font-medium">{error}</p>
                     </div>
                     <button
                       onClick={reset}
-                      className="text-xs font-bold text-rose-400 hover:text-rose-300 underline shrink-0"
+                      className="text-xs font-bold text-rose-500 hover:text-rose-400 underline shrink-0"
                     >
                       Try Again →
                     </button>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
         )}
 
         {/* ── RESULTS DASHBOARD ────────────────────────────────────────── */}
@@ -1154,7 +1110,7 @@ export default function App() {
           <div className="space-y-8 animate-fade-in">
 
             {/* Report header */}
-            <div className="p-6 md:p-8 rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/90 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 md:p-8 rounded-3xl bg-slate-50/40 backdrop-blur-xl border border-slate-200/90 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400 mb-3">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1164,13 +1120,13 @@ export default function App() {
                   Inventory Report
                 </h1>
                 <p className="text-xs text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span><span className="text-slate-300 font-semibold">File:</span> {inventory.video_name}</span>
+                  <span><span className="text-slate-800 font-semibold">File:</span> {inventory.video_name}</span>
                   <span className="text-slate-700">•</span>
-                  <span><span className="text-slate-300 font-semibold">Frames:</span> {inventory.total_frames}</span>
+                  <span><span className="text-slate-800 font-semibold">Frames:</span> {inventory.total_frames}</span>
                   {inventory.timestamp && (
                     <>
                       <span className="text-slate-700">•</span>
-                      <span><span className="text-slate-300 font-semibold">Date:</span> {inventory.timestamp}</span>
+                      <span><span className="text-slate-800 font-semibold">Date:</span> {inventory.timestamp}</span>
                     </>
                   )}
                 </p>
@@ -1180,24 +1136,24 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button
                   onClick={() => { setInventory(null); setIsProcessing(false); setProgress(0); setStatusMsg(''); setActiveStep(0); setError(null) }}
-                  className="px-4 py-2 rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/25 font-bold text-xs text-indigo-400 transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 border border-indigo-500/25 font-bold text-xs text-orange-500 transition-all flex items-center gap-1.5"
                 >
                   <UploadCloud className="w-3.5 h-3.5" />
                   New Scan
                 </button>
                 <button
                   onClick={reset}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 font-bold text-xs text-slate-300 transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-800 border border-slate-200 font-bold text-xs text-slate-800 transition-all flex items-center gap-1.5"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Reset
                 </button>
 
                 {/* Export group */}
-                <div className="flex items-center bg-slate-950 p-0.5 rounded-xl border border-slate-800">
+                <div className="flex items-center bg-white p-0.5 rounded-xl border border-slate-200">
                   <button
                     onClick={copyToClipboard}
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-all flex items-center gap-1.5 text-xs font-bold"
+                    className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-1.5 text-xs font-bold"
                     title="Copy to clipboard"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -1205,7 +1161,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={exportCSV}
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-all flex items-center gap-1.5 text-xs font-bold"
+                    className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-1.5 text-xs font-bold"
                     title="Export CSV"
                   >
                     <FileText className="w-3.5 h-3.5 text-emerald-400" />
@@ -1213,18 +1169,18 @@ export default function App() {
                   </button>
                   <button
                     onClick={exportJSON}
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-all flex items-center gap-1.5 text-xs font-bold"
+                    className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-1.5 text-xs font-bold"
                     title="Export JSON"
                   >
-                    <Download className="w-3.5 h-3.5 text-indigo-400" />
+                    <Download className="w-3.5 h-3.5 text-orange-500" />
                     JSON
                   </button>
                   <button
                     onClick={() => buildPDF(inventory)}
-                    className="p-2 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/30 border border-indigo-500/20 text-indigo-300 transition-all flex items-center gap-1.5 text-xs font-bold ml-1"
+                    className="p-2 rounded-lg bg-orange-500/15 hover:bg-orange-500/30 border border-indigo-500/20 text-orange-600 transition-all flex items-center gap-1.5 text-xs font-bold ml-1"
                     title="Download PDF"
                   >
-                    <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                    <FileText className="w-3.5 h-3.5 text-orange-500" />
                     PDF
                   </button>
                 </div>
@@ -1236,14 +1192,14 @@ export default function App() {
 
             {/* Annotated Frames Viewer */}
             {inventory.annotated_frames && inventory.annotated_frames.length > 0 && (
-              <div className="p-6 md:p-8 rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/90 shadow-md">
-                <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2 mb-4">
-                  <Image className="w-4 h-4 text-indigo-400" />
+              <div className="p-6 md:p-8 rounded-3xl bg-slate-50/40 backdrop-blur-xl border border-slate-200/90 shadow-md">
+                <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-4">
+                  <Image className="w-4 h-4 text-orange-500" />
                   AI Detection Frames
                 </h2>
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                   {inventory.annotated_frames.map((frame, idx) => (
-                    <div key={idx} className="shrink-0 w-[400px] rounded-xl border border-slate-800 overflow-hidden bg-slate-950">
+                    <div key={idx} className="shrink-0 w-[400px] rounded-xl border border-slate-200 overflow-hidden bg-white">
                       <img src={`${API_BASE_URL}${frame}`} alt={`Detection ${idx}`} className="w-full h-auto object-contain" />
                     </div>
                   ))}
@@ -1255,21 +1211,21 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
               {/* Inventory table — 2/3 width */}
-              <div className="lg:col-span-2 space-y-0 p-6 md:p-8 rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/90 shadow-md">
+              <div className="lg:col-span-2 space-y-0 p-6 md:p-8 rounded-3xl bg-slate-50/40 backdrop-blur-xl border border-slate-200/90 shadow-md">
                 {/* Table header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                  <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                    <ListPlus className="w-4 h-4 text-indigo-400" />
+                  <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <ListPlus className="w-4 h-4 text-orange-500" />
                     Detected Objects
                   </h2>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
                     <input
                       type="text"
                       placeholder="Search items..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full sm:w-52 bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full sm:w-52 bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -1283,8 +1239,8 @@ export default function App() {
                       className={[
                         'px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-200 border shrink-0',
                         selectedCategory === cat
-                          ? 'bg-indigo-600/10 border-indigo-500/30 text-indigo-400'
-                          : 'bg-slate-950/60 border-slate-900 text-slate-500 hover:text-slate-300 hover:border-slate-800',
+                          ? 'bg-orange-500/10 border-indigo-500/30 text-orange-500'
+                          : 'bg-white/60 border-slate-100 text-slate-400 hover:text-slate-800 hover:border-slate-200',
                       ].join(' ')}
                     >
                       {cat}
@@ -1293,52 +1249,32 @@ export default function App() {
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden border border-slate-900/80 rounded-2xl bg-slate-950/20">
+                <div className="overflow-hidden border border-slate-100/80 rounded-2xl bg-white/20">
                   {/* Column headers */}
-                  <div className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-slate-900/60 text-[10px] font-extrabold uppercase tracking-widest text-slate-600">
+                  <div className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-slate-100/60 text-[10px] font-extrabold uppercase tracking-widest text-slate-600">
                     <div className="col-span-6 md:col-span-7">Item</div>
                     <div className="col-span-3 text-center">Qty</div>
                     <div className="col-span-3 md:col-span-2 text-right">Actions</div>
                   </div>
 
-                  {Object.keys(groupedInventory).length === 0 ? (
+                  {filteredInventory.length === 0 ? (
                     <div className="p-12 text-center">
                       <Info className="w-7 h-7 text-slate-700 mx-auto mb-3" />
-                      <p className="text-xs text-slate-500 font-medium">No items match the current filters.</p>
+                      <p className="text-xs text-slate-400 font-medium">No items match the current filters.</p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-slate-900/50">
-                      {Object.entries(groupedInventory).map(([roomName, items]) => (
-                        <div key={roomName}>
-                          {/* Room banner */}
-                          <div className="px-5 py-2.5 bg-slate-950/40 border-b border-slate-900/50 flex items-center justify-between">
-                            <span className="text-[11px] font-extrabold tracking-wider text-indigo-400 uppercase flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                              {roomName}
-                            </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-500">
-                              {items.length} {items.length === 1 ? 'item' : 'items'}
-                            </span>
-                          </div>
-
-                          {/* Room items */}
-                          <div className="divide-y divide-slate-900/30">
-                            {items.map((item) => {
-                              const trueIdx = inventory.inventory.findIndex(
-                                x => x.name === item.name && (x.room || 'Unknown Room') === roomName
-                              )
-                              return (
-                                <InventoryRow
-                                  key={`${roomName}-${item.name}`}
-                                  item={item}
-                                  onAdjust={(delta) => adjustQuantity(trueIdx, delta)}
-                                  onRemove={() => removeItem(trueIdx)}
-                                />
-                              )
-                            })}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="divide-y divide-slate-900/30">
+                      {filteredInventory.map((item) => {
+                        const trueIdx = inventory.inventory.findIndex(x => x.name === item.name)
+                        return (
+                          <InventoryRow
+                            key={item.name}
+                            item={item}
+                            onAdjust={(delta) => adjustQuantity(trueIdx, delta)}
+                            onRemove={() => removeItem(trueIdx)}
+                          />
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -1352,13 +1288,10 @@ export default function App() {
             </div>
           </div>
         )}
-      </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 mt-20 w-full py-8 px-6 text-center border-t border-slate-900/50 bg-slate-950/20">
-        <p className="text-xs text-slate-500 mb-1">© 2026 VisionVault AI · All rights reserved.</p>
-        <p className="text-xs text-slate-700">Powered by 3-Tier Hybrid Engine (YOLO26) · 100% local · Zero cloud dependency.</p>
-      </footer>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

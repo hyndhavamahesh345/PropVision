@@ -69,7 +69,7 @@ def process_video_task(self, job_id: str, object_name: str):
         for item in inventory:
             name = item.get("name", "")
             count = item.get("quantity", 0)
-            room = get_local_room_assignment(name)
+            room = "Home"
             
             db_inv = Inventory(job_id=job_id, room=room, object=name, count=count)
             db.add(db_inv)

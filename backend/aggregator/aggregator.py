@@ -4,11 +4,11 @@ from services.inventory.builder import normalize_object_name
 CLASS_THRESHOLDS = {
     "air conditioner": 0.20,
     "ac": 0.20,
-    "ceiling fan": 0.15,
-    "table fan": 0.20,
-    "pedestal fan": 0.20,
-    "wall fan": 0.15,
-    "fan": 0.15,
+    "ceiling fan": 0.05,
+    "table fan": 0.10,
+    "pedestal fan": 0.10,
+    "wall fan": 0.05,
+    "fan": 0.05,
     "chair": 0.35,
     "office chair": 0.40,
     "dining chair": 0.40,
@@ -31,7 +31,7 @@ CLASS_THRESHOLDS = {
     "cabinet": 0.25,
     "refrigerator": 0.60,
     "furniture": 0.25,
-    "bed": 0.35,
+    "bed": 0.45,
     "bunk bed": 0.50,
     "microwave": 0.50,
     "oven": 0.50,
@@ -45,8 +45,8 @@ CLASS_THRESHOLDS = {
     "sink": 0.40,
     "shower": 0.40,
     "toilet": 0.40,
-    "geyser": 0.05,
-    "water heater": 0.05,
+    "geyser": 0.01,
+    "water heater": 0.01,
     "bench": 0.50,
     "rug": 0.85,
     "carpet": 0.85,
@@ -152,17 +152,10 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
                     
                 target_thresh = CLASS_THRESHOLDS.get(canonical, DEFAULT_THRESH)
                 
-                # Sanity rule: Reject very small hallucinated bounding boxes (<400px area)
-                w = bbox[2] - bbox[0]
-                h = bbox[3] - bbox[1]
-                area = w * h
-                if area < 400:
-                    continue
-                
                 if conf >= target_thresh or conf >= UNCERTAIN_THRESH:
                     # Tiered Priority Boosting to force correct NMS hierarchy
                     # Tier 1 (Highest Priority) - Structural/Large fixtures
-                    if canonical in {"chandelier", "ceiling fan", "l-shaped sofa", "bunk bed", "diwan cot", "divan cot", "exhaust fan", "wall fan"}:
+                    if canonical in {"chandelier", "ceiling fan", "fan", "geyser", "water heater", "l-shaped sofa", "bunk bed", "diwan cot", "divan cot", "exhaust fan", "wall fan", "light", "wall light", "ceiling light", "lamp"}:
                         conf += 2.0
                     # Tier 2 (Medium Priority) - Specific furniture items
                     elif canonical in {"office chair", "gaming chair", "dining chair", "bar stool", "floor lamp", "wall light", "ceiling light", "table fan", "pedestal fan", "table lamp"}:
@@ -258,18 +251,29 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
     # Populate inventory_list (prefer Tracking if enabled, but never drop below Scene-Max bounds)
     primary_inventory = {}
     all_possible_labels = set(scene_max_inventory.keys()).union(set(tracking_inventory.keys()))
+    # Items that are almost always singular per room and prone to track fragmentation
+    SINGLE_INSTANCE_ITEMS = {
+        "geyser", "water heater", "refrigerator", "fridge", "television", "tv",
+        "washing machine", "stove", "microwave", "oven", "bathtub", "shower"
+    }
     
     if USE_OBJECT_TRACKING:
         for label in all_possible_labels:
             t_count = tracking_inventory.get(label, 0)
             s_count = scene_max_inventory.get(label, 0)
-            # Tracking can drop tracks on sparse frames. SceneMax is a guaranteed minimum bound.
-            primary_inventory[label] = max(t_count, s_count)
+            
+            if label in SINGLE_INSTANCE_ITEMS:
+                # Force scene max to prevent tracker fragmentation on large appliances
+                primary_inventory[label] = s_count
+            else:
+                # Tracking can drop tracks on sparse frames. SceneMax is a guaranteed minimum bound.
+                primary_inventory[label] = max(t_count, s_count)
     else:
         primary_inventory = scene_max_inventory
     # --- SEMANTIC DEDUPLICATION ---
     # Removes generic objects if a more specific version was found in the same room
     dedup_rules = {
+        "sofa": ["couch", "settee"],
         "l-shaped sofa": ["sofa", "couch"],
         "armchair": ["chair"],
         "gaming chair": ["chair", "office chair"],
@@ -287,13 +291,23 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
         "diwan cot": ["bed", "cot"],
         "divan cot": ["bed", "cot"],
         "refrigerator": ["fridge"],
-        "television": ["tv"],
+        "television": ["tv", "monitor"],
+        "tv": ["television", "monitor"],
         "kitchen cabinet": ["cabinet", "cupboard"],
         "wardrobe": ["closet", "cabinet", "cupboard"],
-        "chandelier": ["ceiling light", "lamp"],
-        "floor lamp": ["lamp"],
-        "table lamp": ["lamp"],
-        "wall light": ["lamp", "ceiling light"],
+        "chandelier": ["ceiling light", "lamp", "light"],
+        "floor lamp": ["lamp", "light"],
+        "table lamp": ["lamp", "light"],
+        "wall light": ["lamp", "ceiling light", "light"],
+        "ceiling light": ["light", "lamp"],
+        "lamp": ["light"],
+        "geyser": ["water heater", "bathroom water heater", "water boiler"],
+        "water heater": ["geyser", "bathroom water heater", "water boiler"],
+        "curtain": ["blinds"],
+        "trash can": ["dustbin", "bin"],
+        "dustbin": ["trash can", "bin"],
+        "ro purifier": ["water purifier"],
+        "water purifier": ["ro purifier"]
     }
     
     keys_to_remove = set()
