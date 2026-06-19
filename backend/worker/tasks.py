@@ -85,3 +85,58 @@ def process_video_task(self, job_id: str, object_name: str):
         # Clean up local video file
         if Path(local_video_path).exists():
             Path(local_video_path).unlink()
+
+@celery_app.task(bind=True)
+def process_frames_task(self, job_id: str):
+    logger.info("[%s] Starting Celery task for pre-extracted frames", job_id)
+    db = SessionLocal()
+    
+    try:
+        job_frames_dir = FRAMES_DIR / job_id
+        if not job_frames_dir.exists():
+            raise FileNotFoundError(f"Frames directory not found: {job_frames_dir}")
+            
+        frames = sorted(list(job_frames_dir.glob("*.jpg"))) + sorted(list(job_frames_dir.glob("*.jpeg")))
+        
+        update_job_status(db, job_id, "extracting", frames_extracted=len(frames))
+
+        if not frames:
+            update_job_status(db, job_id, "error", error="No frames found")
+            return
+
+        update_job_status(db, job_id, "analyzing")
+
+        all_detections = []
+        for idx, frame_path in enumerate(frames):
+            # Route frame through YOLO-World
+            frame_detections = route_frame(str(frame_path), "yolo-world", job_id, idx)
+            all_detections.extend(frame_detections)
+            if idx % 5 == 0:  # Update DB periodically to avoid hammering it
+                update_job_status(db, job_id, "analyzing", frames_analyzed=idx+1)
+
+        update_job_status(db, job_id, "merging", pipeline="yolo-world", frames_analyzed=len(frames))
+        
+        agg_result = aggregate_detections(all_detections)
+        inventory = agg_result["inventory"]
+        validation_data = agg_result.get("validation_data", {})
+        
+        if validation_data:
+            logger.info("[%s] Tracking Validation Data: %s", job_id, validation_data)
+
+        # Save to database
+        for item in inventory:
+            name = item.get("name", "")
+            count = item.get("quantity", 0)
+            room = "Home"
+            
+            db_inv = Inventory(job_id=job_id, room=room, object=name, count=count)
+            db.add(db_inv)
+
+        update_job_status(db, job_id, "completed")
+        db.commit()
+        
+    except Exception as e:
+        logger.exception("[%s] ERROR in Celery task: %s", job_id, e)
+        update_job_status(db, job_id, "error", error=str(e))
+    finally:
+        db.close()

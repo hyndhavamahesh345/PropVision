@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 from config import logger, UPLOAD_DIR
 from db.postgres import get_db, Job, Inventory, init_db
 from storage.minio import init_buckets, upload_video
-from worker.tasks import process_video_task
+from worker.tasks import process_video_task, process_frames_task
+from typing import List
+from fastapi import Form
 
 router = APIRouter()
 
@@ -49,6 +51,40 @@ async def upload_video_endpoint(file: UploadFile = File(...), db: Session = Depe
     process_video_task.delay(job_id, object_name)
 
     return {"job_id": job_id, "message": "Processing started via Celery"}
+
+@router.post("/api/upload_frames")
+async def upload_frames_endpoint(
+    files: List[UploadFile] = File(...),
+    video_name: str = Form("local_frames"),
+    db: Session = Depends(get_db)
+):
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+
+    job_id = str(uuid.uuid4())
+    
+    # Create directory for frames
+    from config import FRAMES_DIR
+    job_frames_dir = FRAMES_DIR / job_id
+    job_frames_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save frames locally
+    import shutil
+    for i, file in enumerate(files):
+        ext = Path(file.filename).suffix.lower() if file.filename else ".jpg"
+        frame_path = job_frames_dir / f"frame_{i:04d}{ext}"
+        with open(frame_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+
+    # Create job in database
+    new_job = Job(id=job_id, status="extracting", video_name=video_name, pipeline="local_frames")
+    db.add(new_job)
+    db.commit()
+
+    # Dispatch Celery Task for processing frames directly
+    process_frames_task.delay(job_id)
+
+    return {"job_id": job_id, "message": "Frame processing started via Celery"}
 
 @router.get("/api/status/{job_id}")
 async def get_status(job_id: str, db: Session = Depends(get_db)):

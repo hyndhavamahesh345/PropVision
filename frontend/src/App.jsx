@@ -36,7 +36,7 @@ import {
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 // The standard API base URL from the Vercel environment variables
-const API_BASE_URL = import.meta.env.MODE === 'production' ? '' : 'http://127.0.0.1:8001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://13.50.225.62:8001';
 
 const CATEGORIES = [
   'All',
@@ -807,32 +807,90 @@ export default function App() {
 
   // ── Upload & polling ───────────────────────────────────────────────────────
 
+  const extractFramesLocal = async (videoFile, maxFrames = 30) => {
+    return new Promise((resolve, reject) => {
+      const videoUrl = URL.createObjectURL(videoFile);
+      const video = document.createElement('video');
+      video.src = videoUrl;
+      video.muted = true;
+      video.crossOrigin = 'anonymous';
+
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        if (!duration || isNaN(duration)) {
+          URL.revokeObjectURL(videoUrl);
+          reject(new Error("Could not determine video duration."));
+          return;
+        }
+        
+        const interval = duration / maxFrames;
+        const frames = [];
+        let currentFrame = 0;
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        canvas.width = 1280;
+        canvas.height = 720;
+        
+        const captureFrame = () => {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            frames.push(new File([blob], `frame_${currentFrame.toString().padStart(4, '0')}.jpg`, { type: 'image/jpeg' }));
+            currentFrame++;
+            if (currentFrame < maxFrames) {
+              video.currentTime = (currentFrame * interval) + (interval / 2);
+            } else {
+              URL.revokeObjectURL(videoUrl);
+              resolve(frames);
+            }
+          }, 'image/jpeg', 0.8);
+        };
+
+        video.onseeked = captureFrame;
+        
+        // Start first seek
+        video.currentTime = interval / 2;
+      };
+      
+      video.onerror = (err) => {
+        URL.revokeObjectURL(videoUrl);
+        reject(err);
+      };
+    });
+  };
+
   const handleUpload = async () => {
     if (!file) return
     setIsProcessing(true)
     setError(null)
     setProgress(5)
     setActiveStep(1)
-    setStatusMsg('Uploading video...')
+    setStatusMsg('Extracting frames locally (this may take a few seconds)...')
 
     try {
+      const frames = await extractFramesLocal(file, 30)
+      
+      setStatusMsg('Uploading compressed frames...')
       const form = new FormData()
-      form.append('file', file)
-      const res = await axios.post(`${API_BASE_URL}/api/upload`, form, {
+      frames.forEach((f) => form.append('files', f))
+      form.append('video_name', file.name)
+      
+      const res = await axios.post(`${API_BASE_URL}/api/upload_frames`, form, {
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            // Scale upload progress (0-100%) to fit within 5% - 15% overall UI progress
             setProgress(5 + (percentCompleted * 0.1))
           }
         }
       })
+      
       setActiveStep(2)
       setStatusMsg('Extracting frames...')
       setProgress(15)
       pollStatus(res.data.job_id)
     } catch (err) {
-      setError(err.response?.data?.detail || 'Upload failed. Check if the backend is running.')
+      setError(err.response?.data?.detail || err.message || 'Upload failed. Check if the backend is running.')
       setIsProcessing(false)
     }
   }
@@ -960,6 +1018,36 @@ export default function App() {
     downloadData(inventory, `inventory_${Date.now()}.json`, 'json')
   }
 
+  const handleNavClick = (nav) => {
+    if (nav === 'Home') {
+      if (inventory) {
+        if (window.confirm("Return to Home? Your current inventory scan will be cleared.")) {
+          reset()
+        }
+      } else {
+        reset()
+      }
+    } else if (nav === 'Export') {
+      if (inventory) {
+        exportCSV()
+      } else {
+        alert("Please process a video first to export your inventory.")
+      }
+    } else if (nav === 'Analytics') {
+      if (inventory) {
+        document.getElementById('analytics-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } else {
+        alert("Please process a video first to view Analytics.")
+      }
+    } else if (nav === 'Inventory') {
+      if (inventory) {
+        document.getElementById('inventory-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } else {
+        alert("Please process a video first to view your Inventory.")
+      }
+    }
+  }
+
   // ── Derived state ──────────────────────────────────────────────────────────
 
   const filteredInventory = useMemo(() => {
@@ -1016,10 +1104,15 @@ export default function App() {
                 <span className="font-extrabold text-lg text-slate-900">VisionVault</span>
               </div>
               <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-500">
-                <span className="text-orange-500 bg-orange-50 px-4 py-1.5 rounded-full">Home</span>
-                <span>Analytics</span>
-                <span>Inventory</span>
-                <span>Export</span>
+                {['Home', 'Analytics', 'Inventory', 'Export'].map(nav => (
+                  <button 
+                    key={nav}
+                    onClick={() => handleNavClick(nav)}
+                    className="hover:text-slate-800 transition-colors"
+                  >
+                    {nav}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -1263,7 +1356,7 @@ export default function App() {
                       <p className="text-xs text-slate-400 font-medium">No items match the current filters.</p>
                     </div>
                   ) : (
-                    <div className="divide-y divide-slate-900/30">
+                    <div id="inventory-list" className="divide-y divide-slate-900/30">
                       {filteredInventory.map((item) => {
                         const trueIdx = inventory.inventory.findIndex(x => x.name === item.name)
                         return (
@@ -1283,7 +1376,9 @@ export default function App() {
               {/* Sidebar — 1/3 width */}
               <div className="space-y-5">
                 <AddItemForm onAdd={addItem} />
-                <AdvisoryPanel inventory={inventory} />
+                <div id="analytics-panel">
+                  <AdvisoryPanel inventory={inventory} />
+                </div>
               </div>
             </div>
           </div>

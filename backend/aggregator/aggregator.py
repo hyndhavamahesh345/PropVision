@@ -307,7 +307,11 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
         "trash can": ["dustbin", "bin"],
         "dustbin": ["trash can", "bin"],
         "ro purifier": ["water purifier"],
-        "water purifier": ["ro purifier"]
+        "water purifier": ["ro purifier"],
+        "carpet": ["rug"],
+        "rug": ["carpet"],
+        "cushion": ["pillow"],
+        "pillow": ["cushion"]
     }
     
     keys_to_remove = set()
