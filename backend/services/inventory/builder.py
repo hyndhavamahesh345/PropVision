@@ -16,7 +16,7 @@ HOUSEHOLD_OBJECTS = [
     "curtain", "blinds", "water purifier", "ro purifier", "gas cylinder", "mixer grinder", "blender", "trash can", "dustbin", "balcony railing", "grill", "washbasin", "tubelight", "swing", "inverter",
     "chimney", "ac", "office chair", "dining chair", "l-shaped sofa", "gaming chair", "bar stool", "bunk bed", "furniture",
     "diwan cot", "divan cot", "unknown object", "plant", "potted plant", "bottle", "mop", "broom", "bucket", "gate", "tv unit", "dressing table"
-]
+, "shoe rack", "coat rack", "doormat", "ironing board", "iron", "vacuum cleaner", "laundry basket", "clothes drying rack", "wall clock", "plant pot", "vase", "picture frame", "painting", "wall art", "sculpture", "statue", "candle", "tissue box", "waste bin", "dustpan", "mop bucket", "soap dispenser", "towel rack", "towel", "bath mat", "shower curtain", "toilet paper holder", "toilet brush", "hair dryer", "humidifier", "dehumidifier", "purifier", "radiator", "thermostat", "smoke detector", "fire extinguisher", "ladder", "router", "modem", "smart speaker", "security camera", "safe", "storage box", "basket", "bookend", "whiteboard", "ironing stand", "study chair", "bean bag", "console table", "bidet", "shower head", "exhaust hood", "rice cooker", "toaster", "air fryer", "coffee maker", "water cooler", "kettle", "wine cooler", "center table", "shoe cabinet", "tv stand"]
 
 UNIQUE_HOUSEHOLD_OBJECTS = sorted(list(set([
     "sofa", "l-shaped sofa", "chair", "armchair", "office chair", "dining chair", "gaming chair", "bar stool", 
@@ -33,7 +33,7 @@ UNIQUE_HOUSEHOLD_OBJECTS = sorted(list(set([
     "power plugs", "light switch", "chimney", "stool", "furniture", "unknown object",
     "curtain", "blinds", "water purifier", "gas cylinder", "mixer grinder", "trash can", "balcony railing", "swing", "inverter",
     "plant", "bottle", "mop", "broom", "bucket", "gate", "tv unit", "dressing table"
-])))
+, "shoe rack", "coat rack", "doormat", "ironing board", "iron", "vacuum cleaner", "laundry basket", "clothes drying rack", "wall clock", "plant pot", "vase", "picture frame", "painting", "wall art", "sculpture", "statue", "candle", "tissue box", "waste bin", "dustpan", "mop bucket", "soap dispenser", "towel rack", "towel", "bath mat", "shower curtain", "toilet paper holder", "toilet brush", "hair dryer", "humidifier", "dehumidifier", "purifier", "radiator", "thermostat", "smoke detector", "fire extinguisher", "ladder", "router", "modem", "smart speaker", "security camera", "safe", "storage box", "basket", "bookend", "whiteboard", "ironing stand", "study chair", "bean bag", "console table", "bidet", "shower head", "exhaust hood", "rice cooker", "toaster", "air fryer", "coffee maker", "water cooler", "kettle", "wine cooler", "center table", "shoe cabinet", "tv stand"])))
 
 CANONICAL = {
     "couch": "sofa", "settee": "sofa",
@@ -109,3 +109,4 @@ def merge_detections(detections_per_frame: List[List[str]]) -> List[Dict]:
     ]
     inventory.sort(key=lambda x: x["quantity"], reverse=True)
     return inventory
+
