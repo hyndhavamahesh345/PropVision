@@ -255,9 +255,18 @@ def aggregate_detections(all_frame_detections: List[Dict[str, Any]]) -> Dict[str
     for label, id_set in tracked_unique_objects.items():
         tracking_inventory[label] = len(id_set)
         
-    # Populate inventory_list (prefer Tracking if enabled)
-    primary_inventory = tracking_inventory if USE_OBJECT_TRACKING else scene_max_inventory
+    # Populate inventory_list (prefer Tracking if enabled, but never drop below Scene-Max bounds)
+    primary_inventory = {}
+    all_possible_labels = set(scene_max_inventory.keys()).union(set(tracking_inventory.keys()))
     
+    if USE_OBJECT_TRACKING:
+        for label in all_possible_labels:
+            t_count = tracking_inventory.get(label, 0)
+            s_count = scene_max_inventory.get(label, 0)
+            # Tracking can drop tracks on sparse frames. SceneMax is a guaranteed minimum bound.
+            primary_inventory[label] = max(t_count, s_count)
+    else:
+        primary_inventory = scene_max_inventory
     # --- SEMANTIC DEDUPLICATION ---
     # Removes generic objects if a more specific version was found in the same room
     dedup_rules = {
